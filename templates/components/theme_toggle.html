@@ -1,0 +1,61 @@
+<!-- components/theme_toggle.html -->
+
+<button
+        id="theme-toggle"
+        class="group relative inline-flex h-8 w-14 items-center rounded-full
+             bg-zinc-300 dark:bg-zinc-800
+             transition-colors duration-300"
+        aria-label="Toggle theme"
+>
+    <!-- Thumb -->
+    <span
+            id="toggle-thumb"
+            class="inline-flex h-6 w-6 transform items-center justify-center
+               rounded-full bg-white shadow-lg
+               transition-all duration-300
+               translate-x-1 dark:translate-x-7"
+    >
+
+        <!-- Sun icon -->
+        <svg
+                id="sun-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+                class="h-4 w-4 text-yellow-500 dark:hidden"
+        >
+          <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 3v2.25M12 18.75V21
+               M4.22 4.22l1.591 1.591
+               M18.19 18.19l1.591 1.591
+               M3 12h2.25
+               M18.75 12H21
+               M4.22 19.78l1.591-1.591
+               M18.19 5.81l1.591-1.591
+               M15.75 12a3.75 3.75 0 11-7.5 0
+               3.75 3.75 0 017.5 0z">
+          </path>
+        </svg>
+        <!-- Moon icon -->
+        <svg
+                id="moon-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+                class="hidden h-4 w-4 text-indigo-500 dark:block"
+        >
+          <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M21 12.79A9 9 0 1111.21 3
+               7 7 0 0021 12.79z"
+          ></path>
+        </svg>
+      </span>
+</button>

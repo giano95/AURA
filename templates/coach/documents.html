@@ -1,0 +1,23 @@
+<!-- templates/coach/documents.html -->
+
+{% extends "coach/_base_view.html" %}
+
+{% block main_content %}
+
+    <div class="flex-1 p-10">
+        <h1>My Routines</h1>
+
+        <ul>
+            {% for routine in routines %}
+                <li>
+                    <strong>{{ routine.name }}</strong> ({{ routine.created_at }})
+                    <!-- Django automatically injects the primary key into the URL here -->
+                    <a href="{% url 'routine_dashboard' routine_id=routine.pk %}">Edit Routine</a>
+                </li>
+            {% empty %}
+                <p>No routines found. Create one below!</p>
+            {% endfor %}
+        </ul>
+    </div>
+
+{% endblock main_content %}

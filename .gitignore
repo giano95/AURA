@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+db.sqlite3
+
+# Node
+node_modules/
+package-lock.json
+
+# Static build output
+static/CACHE/
+static/src/output.css
+
+# Media uploads
+media/uploads/
+
+# IDE
+.idea/
+
+# macOS
+.DS_Store
