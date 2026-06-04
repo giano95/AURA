@@ -20,7 +20,6 @@ urlpatterns = [
     path('user/', include('user.urls')),
     path('coach/', include('coach.urls')),
     path('', include('workouts.urls')),
-    path("api-auth/", include("rest_framework.urls")),
     path("api/", api.urls),
 ]
 
