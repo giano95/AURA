@@ -3,6 +3,6 @@ from .models import *
 
 # Register your models here.
 admin.site.register(Exercise)
-admin.site.register(Routine)
 admin.site.register(Workout)
-admin.site.register(WorkoutItem)
+admin.site.register(WorkoutDay)
+admin.site.register(WorkoutDayRow)

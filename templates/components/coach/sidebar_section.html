@@ -1,9 +1,11 @@
 <!-- components/coach/sidebar_section.html -->
 
+{% load coach_tags %}
+
 <a href="{% url url_name %}"
    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium z-50
         {% url url_name as section_url %}
-        {% if request.path == section_url %}
+        {% if request.path|startswith:section_url %}
             bg-white/60 dark:bg-black/50 text-black dark:text-white
         {% else %}
             text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white

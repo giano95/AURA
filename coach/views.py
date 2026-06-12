@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from coach.decorators import coach_required
-from workouts.models import Workout, Routine
+from workouts.models import Workout
 
 
 @login_required
@@ -19,8 +19,8 @@ def coach_clients(request):
 @login_required
 @coach_required
 def coach_documents(request):
-    routines = Routine.objects.all().order_by('-created_at')
-    return render(request, 'coach/documents.html', {'routines': routines})
+    workouts = Workout.objects.all().order_by('-created_at')
+    return render(request, 'coach/documents.html', {'workouts': workouts})
 
 
 @login_required

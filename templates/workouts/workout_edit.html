@@ -1,283 +1,318 @@
-<!-- templates/coach/dashboard.html -->
+<!-- templates/workouts/workout_edit.html -->
 
 {% extends "coach/_base_view.html" %}
 
 {% block main_content %}
 
-    <div id="routine-workspace" class="grid grid-cols-1 lg:grid-cols-5 gap-8 w-full"
-         hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+<div id="workout-workspace" class="grid grid-cols-1 lg:grid-cols-5 gap-10 w-full p-10"
+     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
-        <div class="lg:col-span-3 shadow-2xl p-6 rounded-lg gap-2
-                bg-black/10 dark:bg-white/10 border border-black/20 dark:border-white/20">
+    <!-- ====== LEFT COLUMN: Workout Overview ====== -->
+    <div class="lg:col-span-3">
 
+        <!-- Header Section -->
+        <div class="px-0 pb-6 lg:pb-8">
+            <h1 class="text-xl lg:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                {{ workout.name }}
+            </h1>
+            <p class="mt-1 text-xs lg:text-sm text-gray-500 dark:text-gray-400">
+                workout
+            </p>
+        </div>
+
+        <!-- Content Section -->
+        <div class="">
             {% if workout %}
-                <div class="mb-6">
-                    <input type="text" name="workout_name" value="{{ workout.name }}"
-                           hx-post="{% url 'update_workout_name' workout.id %}"
-                           hx-trigger="keyup delay:500ms"
-                           class="w-full border-b border-transparent hover:border-black dark:hover:border-gray-200 focus:border-indigo-600 dark:focus:border-indigo-500
+            {% comment %}
+            <div class="mb-6">
+                <input type="text" name="workout_name" value="{{ workout.name }}"
+                       hx-post="{% url 'update_workout_name' workout.id %}"
+                       hx-trigger="keyup delay:500ms"
+                       class="w-full border-b border-transparent hover:border-black dark:hover:border-gray-200 focus:border-indigo-600 dark:focus:border-indigo-500
                            focus:outline-none text-xl lg:text-2xl font-bold py-1 transition-colors
                            text-gray-500 dark:text-gray-300 focus:text-indigo-600 dark:focus:text-indigo-500">
-                </div>
-            {% else %}
-                <div class="mb-6">
-                    <h1 class="text-xl lg:text-2xl font-bold text-gray-400 italic">No Training Days Created Yet</h1>
-                </div>
-            {% endif %}
+            </div>
+            {% endcomment %}
 
             <div class="flex font-semibold text-sm lg:text-md">
-                {% for day in routine.days.all %}
-                    <button hx-get="{% url 'get_workout_day' day.id %}"
-                            hx-target="body"
-                            class="py-2 px-4 min-w-20 lg:min-w-24 min-h-10 lg:min-h-12 transition-all rounded-t-lg
-                            {% if forloop.first %}{% else %}-ml-px{% endif %}
-                            {% if workout and day.id == workout.id %}
-                                bg-black dark:bg-white text-gray-300 dark:text-gray-500 mb-[-1px] relative z-10
+                {% for day in workout.days.all %}
+                <button hx-get="{% url 'get_workout_day' day.id %}"
+                        hx-target="body"
+                        class="py-2 px-4 min-w-20 lg:min-w-24 min-h-10 lg:min-h-12 transition-all rounded-t-lg
+                            bg-black/10 dark:bg-white/10
+                            {% if forloop.first %} {% else %} -ml-px {% endif %}
+                            {% if workout_day and day.id == workout_day.id %}
+                                border-2 border-b-2 border-indigo-600 dark:border-indigo-500 text-indigo-600 dark:text-indigo-500 relative z-10
                             {% else %}
-                                border border-b-0 border-gray-500 dark:border-gray-400 text-gray-500 dark:text-gray-400
+                                border border-b border-b-gray-500 dark:border-b-gray-400 border-black/20 dark:border-white/20 text-gray-900 dark:text-white
                                 hover:z-50 hover:border-black dark:hover:border-white hover:text-black dark:hover:text-white
                             {% endif %}">
-                        {{ day.name }}
-                    </button>
+                    {{ day.name }}
+                </button>
                 {% endfor %}
 
-                <button hx-post="{% url 'create_workout_day' routine.id %}"
-                        hx-target="#routine-workspace"
+                <button hx-post="{% url 'create_workout_day' workout.id %}"
+                        hx-target="#workout-workspace"
                         hx-swap="outerHTML"
-                        class="-ml-px py-2 px-4 min-w-20 lg:min-w-24 min-h-10 lg:min-h-12 rounded-t-lg
-                        border border-dashed border-b-0 border-gray-500 dark:border-gray-400 text-gray-500 dark:text-gray-400
+                        class="-ml-px py-2 px-4 min-w-20 lg:min-w-28 min-h-10 lg:min-h-12 rounded-t-lg
+                        border border-dashed border-b-solids border-gray-500 dark:border-gray-400 text-gray-500 dark:text-gray-400
                         hover:z-50 hover:border-solid hover:border-black dark:hover:border-white hover:text-black dark:hover:text-white
                         flex items-center gap-1 transition-all focus:outline-none">
                     <span class="text-sm font-bold leading-none">+</span> Add Day
                 </button>
+
+                <div class="w-full border-b border-gray-500 dark:border-gray-400"></div>
             </div>
 
-            <!-- Workout Section -->
-            <div class="overflow-x-auto border-t-4 border-b-4 border-black dark:border-white">
+            <!-- Workout Day Section -->
+            <div class="overflow-x-auto border-b border-l border-r border-gray-500 dark:border-gray-400 rounded-b-xl shadow-2xl">
 
-                {% if workout and workout.items and workout.items.count != 0 %}
+                {% if workout_day and workout_day.rows and workout_day.rows.count != 0 %}
 
-                    <!-- Workout Table -->
-                    <table class="w-full border-collapse text-left text-sm border-0 border-gray-500 dark:border-gray-400">
+                <!-- Workout Table -->
+                <table class="w-full border-collapse text-left text-sm border-0 border-gray-500 dark:border-gray-400">
 
-                        <!-- Workout Table Head -->
-                        <thead>
-                        <tr class="bg-black/10 dark:bg-white/10 border-b border-gray-500 dark:border-gray-400 text-gray-700 dark:text-white font-semibold">
+                    <!-- Workout Table Head -->
+                    <thead>
+                    <tr class="bg-black/10 dark:bg-white/10 border-b border-gray-500 dark:border-gray-400 text-gray-700 dark:text-white font-semibold">
 
-                            <th class="h-12 text-left pl-4 pr-2 border-0 border-gray-500 dark:border-gray-400">
-                                Exercise
-                            </th>
-                            <th class="py-4 px-2.5 w-20 text-center border-0 border-gray-500 dark:border-gray-400">
-                                Sets
-                            </th>
-                            <th class="py-4 px-2.5 w-20 text-center border-0 border-gray-500 dark:border-gray-400">
-                                Reps
-                            </th>
-                            <th class="ppy-4 px-2.5 w-24 text-center border-0 border-gray-500 dark:border-gray-400">
-                                Weight
-                            </th>
-                            <th class="py-4 px-2.5 w-28 text-center border-0 border-gray-500 dark:border-gray-400">
-                                Rest
-                            </th>
-                            <th class="py-4 px-2.5 text-center">
-                                Actions
-                            </th>
-                        </tr>
-                        </thead>
+                        <th class="h-12 text-left pl-4 pr-2 border-0 border-gray-500 dark:border-gray-400">
+                            Exercise
+                        </th>
+                        <th class="py-4 px-2.5 w-20 text-center border-0 border-gray-500 dark:border-gray-400">
+                            Sets
+                        </th>
+                        <th class="py-4 px-2.5 w-20 text-center border-0 border-gray-500 dark:border-gray-400">
+                            Reps
+                        </th>
+                        <th class="py-4 px-2.5 w-24 text-center border-0 border-gray-500 dark:border-gray-400">
+                            Weight
+                        </th>
+                        <th class="py-4 px-2.5 w-28 text-center border-0 border-gray-500 dark:border-gray-400">
+                            Rest
+                        </th>
+                        <th class="py-4 px-2.5 text-center">
+                            Actions
+                        </th>
+                    </tr>
+                    </thead>
 
-                        <!-- Workout Table Body -->
-                        <tbody id="workout-rows" class="divide-y divide-gray-500 dark:divide-gray-400">
+                    <!-- Workout Table Body -->
+                    <tbody id="workout-rows" class="divide-y divide-gray-500 dark:divide-gray-400">
 
-                        {% for item in workout.items.all %}
+                    {% for row in workout_day.rows.all %}
 
-                            {% partialdef workout_row inline %}
+                    {% partialdef workout_row inline %}
 
-                                <tr id="row-{{ item.id }}"
-                                    class="transition-colors group text-gray-500 dark:text-gray-400 font-semibold">
-                                    <td class="h-16 py-auto text-left pl-4 pr-2 border-0 border-gray-500 dark:border-gray-400">
+                    <tr id="row-{{ row.id }}"
+                        class="transition-colors group text-gray-500 dark:text-gray-400 font-semibold">
+                        <td class="h-16 py-auto text-left pl-4 pr-2 border-0 border-gray-500 dark:border-gray-400">
                                         <span class="text-md block text-gray-700 dark:text-white">
-                                            {{ item.exercise.name }}
+                                            {{ row.exercise.name }}
                                         </span>
-                                        <span class="text-xs font-medium">
-                                            {{ item.exercise.muscle_group }}
+                            <span class="text-xs font-medium">
+                                            {{ row.exercise.muscle_group }}
                                         </span>
-                                    </td>
-                                    <td class="py-3 px-2 border-0 border-gray-500 dark:border-gray-400">
-                                        <input type="number" name="sets" value="{{ item.sets }}"
-                                               hx-post="{% url 'update_exercise_row' item.id %}"
-                                               hx-trigger="change, keyup delay:500ms" hx-include="closest tr"
-                                               class="w-full h-full text-center p-1 rounded
+                        </td>
+                        <td class="py-3 px-2 border-0 border-gray-500 dark:border-gray-400">
+                            <input type="number" name="sets" value="{{ row.sets }}"
+                                   hx-post="{% url 'update_exercise_row' row.id %}"
+                                   hx-trigger="change, keyup delay:500ms" hx-include="closest tr"
+                                   class="w-full h-full text-center p-1 rounded
                                                focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                                    </td>
-                                    <td class="py-3 px-2 border-0 border-gray-500 dark:border-gray-400">
-                                        <input type="number" name="reps" value="{{ item.reps }}"
-                                               hx-post="{% url 'update_exercise_row' item.id %}"
-                                               hx-trigger="change, keyup delay:500ms" hx-include="closest tr"
-                                               class="w-full text-center p-1
+                        </td>
+                        <td class="py-3 px-2 border-0 border-gray-500 dark:border-gray-400">
+                            <input type="number" name="reps" value="{{ row.reps }}"
+                                   hx-post="{% url 'update_exercise_row' row.id %}"
+                                   hx-trigger="change, keyup delay:500ms" hx-include="closest tr"
+                                   class="w-full text-center p-1
                                                 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                                    </td>
-                                    <td class="py-3 px-2 border-0 border-gray-500 dark:border-gray-400">
-                                        <input type="number" step="0.5" name="weight" value="{{ item.weight }}"
-                                               hx-post="{% url 'update_exercise_row' item.id %}"
-                                               hx-trigger="change, keyup delay:500ms" hx-include="closest tr"
-                                               class="w-full text-center p-1
+                        </td>
+                        <td class="py-3 px-2 border-0 border-gray-500 dark:border-gray-400">
+                            <input type="number" step="0.5" name="weight" value="{{ row.weight }}"
+                                   hx-post="{% url 'update_exercise_row' row.id %}"
+                                   hx-trigger="change, keyup delay:500ms" hx-include="closest tr"
+                                   class="w-full text-center p-1
                                                rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                                    </td>
-                                    <td class="py-3 px-2 border-0 border-gray-500 dark:border-gray-400">
-                                        <input type="text" name="rest" value="{{ item.rest }}"
-                                               hx-post="{% url 'update_exercise_row' item.id %}"
-                                               hx-trigger="change, keyup delay:500ms" hx-include="closest tr"
-                                               class="w-full text-center p-1 rounded
+                        </td>
+                        <td class="py-3 px-2 border-0 border-gray-500 dark:border-gray-400">
+                            <input type="text" name="rest" value="{{ row.rest }}"
+                                   hx-post="{% url 'update_exercise_row' row.id %}"
+                                   hx-trigger="change, keyup delay:500ms" hx-include="closest tr"
+                                   class="w-full text-center p-1 rounded
                                                focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                                    </td>
-                                    <td class="py-3 px-2 text-center">
-                                        <button type="button" hx-delete="{% url 'delete_exercise_row' item.id %}"
-                                                hx-target="#row-{{ item.id }}" hx-swap="outerHTML"
-                                                class="text-sm text-red-500 hover:text-red-700 font-medium">
-                                            Delete
-                                        </button>
-                                    </td>
-                                </tr>
+                        </td>
+                        <td class="py-3 px-2 text-center">
+                            <button type="button" hx-delete="{% url 'delete_exercise_row' row.id %}"
+                                    hx-target="#row-{{ row.id }}" hx-swap="outerHTML"
+                                    class="text-sm text-red-500 hover:text-red-700 font-medium">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
 
-                            {% endpartialdef %}
+                    {% endpartialdef %}
 
-                        {% endfor %}
+                    {% endfor %}
 
-                        </tbody>
+                    </tbody>
 
-                    </table>
+                </table>
 
+                {% elif workout_day %}
+                <div class="w-full text-center py-8 text-gray-400 text-sm">
+                    Begin by adding exercises...
+                </div>
                 {% else %}
-                    <div class="w-ful text-center py-8 text-gray-400 text-sm">
-                        Begin by adding exercises...
-                    </div>
+                <div class="w-full text-center py-8 text-gray-400 text-sm">
+                    No workout day selected.
+                </div>
                 {% endif %}
             </div>
 
+            {% else %}
+            <div class="mb-6">
+                <h1 class="text-xl lg:text-2xl font-bold text-gray-400 italic">No Workout</h1>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ====== RIGHT COLUMN: Add Exercise ====== -->
+    <div class="lg:col-span-2 min-w-0 flex flex-col h-[calc(100vh-8rem)]">
+
+        <!-- Header Section -->
+        <div class="px-0 pb-6 lg:pb-8">
+            <h1 class="text-xl lg:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                Exercise
+            </h1>
+            <p class="mt-1 text-xs lg:text-sm text-gray-500 dark:text-gray-400">
+                section
+            </p>
         </div>
 
-        <div class="lg:col-span-2 min-w-0 p-6 flex flex-col h-[calc(100vh-5rem)] rounded-lg shadow-2xl
-            bg-black/10 dark:bg-white/10 border border-black/20 dark:border-white/20">
-            <h2 class="text-xl lg:text-2xl font-bold mb-4 text-gray-700 dark:text-white">Add Exercise</h2>
+        <!-- Content Section -->
+        <div class="p-6 flex-1 flex flex-col min-h-0 shadow-2xl rounded-lg
+                bg-black/10 dark:bg-white/10 border border-black/20 dark:border-white/20">
+            {% if workout_day %}
+            <div class="flex border-b border-gray-200 mb-4 text-sm font-medium flex-shrink-0">
+                <button hx-get="{% url 'get_search_tab' workout_day.id %}" hx-target="#sidebar-tab-content"
+                        class="py-2 px-4 text-blue-600 border-b-2 border-blue-600 focus:outline-none">
+                    Search
+                </button>
+                <button hx-get="{% url 'get_create_tab' workout_day.id %}" hx-target="#sidebar-tab-content"
+                        class="py-2 px-4 text-gray-500 hover:text-gray-700 focus:outline-none">
+                    Create New
+                </button>
+            </div>
 
-            {% if workout %}
-                <div class="flex border-b border-gray-200 mb-4 text-sm font-medium">
-                    <button hx-get="{% url 'get_search_tab' workout.id %}" hx-target="#sidebar-tab-content"
-                            class="py-2 px-4 text-blue-600 border-b-2 border-blue-600 focus:outline-none">
-                        Search
-                    </button>
-                    <button hx-get="{% url 'get_create_tab' workout.id %}" hx-target="#sidebar-tab-content"
-                            class="py-2 px-4 text-gray-500 hover:text-gray-700 focus:outline-none">
-                        Create New
-                    </button>
-                </div>
-
-                <div id="sidebar-tab-content" class="flex-1 flex flex-col min-h-0">
-                    {% partialdef search_tab inline %}
-                        <div class="flex flex-col flex-1 min-h-0">
-                            <div class="relative mb-4">
+            <div id="sidebar-tab-content" class="flex-1 flex flex-col min-h-0">
+                {% partialdef search_tab inline %}
+                <div class="flex flex-col flex-1 min-h-0">
+                    <div class="relative mb-4">
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path
                                         stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                             </span>
-                                <input type="search" name="search" placeholder="Search exercises..."
-                                       hx-get="{% url 'search_exercises' workout.id %}"
-                                       hx-trigger="keyup delay:200ms, search"
-                                       hx-target="#exercise-pool-list"
-                                       class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all placeholder-gray-400">
+                        <input type="search" name="search" placeholder="Search exercises..."
+                               hx-get="{% url 'search_exercises' workout_day.id %}"
+                               hx-trigger="keyup delay:200ms, search"
+                               hx-target="#exercise-pool-list"
+                               class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all placeholder-gray-400">
+                    </div>
+
+                    <div id="exercise-pool-list"
+                         class="flex-1 overflow-y-auto divide-y divide-gray-100 pr-1 space-y-1">
+                        {% partialdef exercise_pool inline %}
+                        {% for ex in exercises %}
+                        <div class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors group">
+                            <div class="flex items-center gap-4">
+                                {% if ex.image_url %}
+                                <img src="{{ ex.image_url }}"
+                                     class="w-12 h-12 rounded-md object-cover bg-gray-100 border border-gray-100"
+                                     alt="{{ ex.name }}">
+                                {% else %}
+                                <div class="w-12 h-12 rounded-md bg-gray-100 flex items-center justify-center text-gray-400 border border-dashed border-gray-200">
+                                    🏋️‍♂️
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <span class="font-medium text-gray-900 block leading-tight">{{ ex.name }}</span>
+                                    <span class="text-xs text-gray-500 font-medium tracking-wide uppercase mt-0.5 block">{{ ex.muscle_group }}</span>
+                                </div>
                             </div>
-
-                            <div id="exercise-pool-list"
-                                 class="flex-1 overflow-y-auto divide-y divide-gray-100 pr-1 space-y-1">
-                                {% partialdef exercise_pool inline %}
-                                    {% for ex in exercises %}
-                                        <div class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors group">
-                                            <div class="flex items-center gap-4">
-                                                {% if ex.image_url %}
-                                                    <img src="{{ ex.image_url }}"
-                                                         class="w-12 h-12 rounded-md object-cover bg-gray-100 border border-gray-100"
-                                                         alt="{{ ex.name }}">
-                                                {% else %}
-                                                    <div class="w-12 h-12 rounded-md bg-gray-100 flex items-center justify-center text-gray-400 border border-dashed border-gray-200">
-                                                        🏋️‍♂️
-                                                    </div>
-                                                {% endif %}
-                                                <div>
-                                                    <span class="font-medium text-gray-900 block leading-tight">{{ ex.name }}</span>
-                                                    <span class="text-xs text-gray-500 font-medium tracking-wide uppercase mt-0.5 block">{{ ex.muscle_group }}</span>
-                                                </div>
-                                            </div>
-                                            <button class="w-8 h-8 rounded-full border border-blue-200 text-blue-600 flex items-center justify-center font-semibold text-lg bg-blue-50/50 hover:bg-blue-600 hover:text-white hover:border-blue-600 focus:outline-none transition-all"
-                                                    hx-post="{% url 'add_exercise_row' workout.id %}"
-                                                    hx-vals='{"exercise_id": "{{ ex.id }}"}'
-                                                    hx-target="#workout-rows"
-                                                    hx-swap="beforeend">+
-                                            </button>
-                                        </div>
-                                    {% empty %}
-                                        <div class="text-center py-12 text-gray-400 text-sm">No exercises found.</div>
-                                    {% endfor %}
-                                {% endpartialdef %}
-                            </div>
-                        </div>
-                    {% endpartialdef %}
-
-                    {% partialdef create_tab %}
-                        <form hx-post="{% url 'create_and_add_exercise' workout.id %}"
-                              hx-target="#workout-rows"
-                              hx-swap="beforeend"
-                              hx-on::after-request="this.reset()"
-                              class="space-y-4 bg-gray-50/50 p-4 rounded-xl border border-gray-100">
-
-                            <div>
-                                <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Exercise
-                                    Name</label>
-                                <input type="text" name="name" required placeholder="e.g., Incline Dumbbell Flyes"
-                                       class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Target
-                                    Muscle Group</label>
-                                <input type="text" name="muscle_group" required placeholder="e.g., Chest"
-                                       class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Thumbnail
-                                    Image URL (Optional)</label>
-                                <input type="url" name="image_url" placeholder="https://example.com/image.jpg"
-                                       class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
-                            </div>
-
-                            <button type="submit"
-                                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm shadow-sm">
-                                Create & Add to Workout
+                            <button class="w-8 h-8 rounded-full border border-blue-200 text-blue-600 flex items-center justify-center font-semibold text-lg bg-blue-50/50 hover:bg-blue-600 hover:text-white hover:border-blue-600 focus:outline-none transition-all"
+                                    hx-post="{% url 'add_exercise_row' workout_day.id %}"
+                                    hx-vals='{"exercise_id": "{{ ex.id }}"}'
+                                    hx-target="#workout-rows"
+                                    hx-swap="beforeend">+
                             </button>
-                        </form>
-                    {% endpartialdef %}
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-12 text-gray-400 text-sm">No exercises found.</div>
+                        {% endfor %}
+                        {% endpartialdef %}
+                    </div>
                 </div>
+                {% endpartialdef %}
+
+                {% partialdef create_tab %}
+                <form hx-post="{% url 'create_and_add_exercise' workout_day.id %}"
+                      hx-target="#workout-rows"
+                      hx-swap="beforeend"
+                      hx-on::after-request="this.reset()"
+                      class="space-y-4 bg-gray-50/50 p-4 rounded-xl border border-gray-100">
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Exercise
+                            Name</label>
+                        <input type="text" name="name" required placeholder="e.g., Incline Dumbbell Flyes"
+                               class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Target
+                            Muscle Group</label>
+                        <input type="text" name="muscle_group" required placeholder="e.g., Chest"
+                               class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Thumbnail
+                            Image URL (Optional)</label>
+                        <input type="url" name="image_url" placeholder="https://example.com/image.jpg"
+                               class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                    </div>
+
+                    <button type="submit"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm shadow-sm">
+                        Create & Add to Workout
+                    </button>
+                </form>
+                {% endpartialdef %}
+            </div>
             {% else %}
-                <div class="flex-1 flex flex-col items-center justify-center border border-dashed border-gray-200 rounded-xl bg-gray-50/50 p-6 text-center">
-                    <span class="text-3xl mb-2">📅</span>
-                    <p class="text-sm text-gray-500 max-w-xs">Please add or select a training day tab on the left to
-                        start adding movements.</p>
-                </div>
+            <div class="flex-1 flex flex-col items-center justify-center border border-dashed border-gray-200 rounded-xl bg-gray-50/50 p-6 text-center">
+                <span class="text-3xl mb-2">📅</span>
+                <p class="text-sm text-gray-500 max-w-xs">Please add or select a training day tab on the left to
+                    start adding movements.</p>
+            </div>
             {% endif %}
         </div>
     </div>
+</div>
 
-    <script>
-        document.body.addEventListener('htmx:afterOnLoad', function (evt) {
-            if (evt.detail.target.id === 'sidebar-tab-content') {
-                const trigger = evt.detail.requestConfig.elt;
-                trigger.parentNode.querySelectorAll('button').forEach(btn => {
-                    btn.className = 'py-2 px-4 text-gray-500 hover:text-gray-700 focus:outline-none';
-                });
-                trigger.className = 'py-2 px-4 text-blue-600 border-b-2 border-blue-600 focus:outline-none';
-            }
-        });
-    </script>
+<script>
+    document.body.addEventListener('htmx:afterOnLoad', function (evt) {
+        if (evt.detail.target.id === 'sidebar-tab-content') {
+            const trigger = evt.detail.requestConfig.elt;
+            trigger.parentNode.querySelectorAll('button').forEach(btn => {
+                btn.className = 'py-2 px-4 text-gray-500 hover:text-gray-700 focus:outline-none';
+            });
+            trigger.className = 'py-2 px-4 text-blue-600 border-b-2 border-blue-600 focus:outline-none';
+        }
+    });
+</script>
 
 {% endblock main_content %}

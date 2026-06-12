@@ -5,19 +5,99 @@
 {% block main_content %}
 
     <div class="flex-1 p-10">
-        <h1>My Routines</h1>
 
-        <ul>
-            {% for routine in routines %}
-                <li>
-                    <strong>{{ routine.name }}</strong> ({{ routine.created_at }})
-                    <!-- Django automatically injects the primary key into the URL here -->
-                    <a href="{% url 'routine_dashboard' routine_id=routine.pk %}">Edit Routine</a>
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">My Workouts</h1>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Manage your workout programs</p>
+            </div>
+            <a href="#"
+               class="inline-flex items-center gap-x-2 rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                New workout
+            </a>
+        </div>
+
+        <ul role="list" class="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+
+            {% for workout in workouts %}
+
+                <li class="overflow-hidden rounded-xl border border-black/20 dark:border-white/20 shadow-2xl">
+
+                    <!-- Header: icon + name on left, edit link on right -->
+                    <div class="flex items-center gap-x-4 p-6 bg-black/10 dark:bg-white/10 border-b border-black/20 dark:border-white/20">
+
+                        <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-indigo-600">
+                            <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                 stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z">
+                                </path>
+                            </svg>
+                        </div>
+
+                        <div class="min-w-0 flex-1">
+                            <p class="text-md font-semibold text-gray-900 dark:text-white truncate">{{ workout.name }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ workout.created_at|date:"M j, Y" }}</p>
+                        </div>
+
+                        <a href="{% url 'workout_dashboard' workout_id=workout.pk %}"
+                           class="flex-shrink-0 rounded-md bg-indigo-600 px-2.5 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                            Edit
+                        </a>
+
+                    </div>
+                    <!-- Days list -->
+                    <div class="px-6 py-4">
+                        {% with days=workout.days.all %}
+                            {% if days %}
+                                <ul class="space-y-1">
+                                    {% for day in days %}
+                                        <li class="text-sm text-gray-600 dark:text-gray-400">
+                                            <span class="inline-flex items-center gap-x-1.5">
+                                                <svg class="h-4 w-4 text-indigo-500 flex-shrink-0" fill="none"
+                                                     viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                          d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z">
+                                                    </path>
+                                                </svg>
+                                                {{ day.name }}
+                                            </span>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p class="text-sm text-gray-400 dark:text-gray-500 italic">No days added yet</p>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
                 </li>
+
             {% empty %}
-                <p>No routines found. Create one below!</p>
+
+                <li class="col-span-full">
+                    <div class="rounded-xl border border-dashed border-gray-300 dark:border-white/20 p-12 text-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                             stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z">
+                            </path>
+                        </svg>
+                        <h3 class="mt-2 text-sm font-semibold text-gray-900 dark:text-white">No workouts</h3>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by creating a new
+                            workout.</p>
+                        <div class="mt-6">
+                            <a href="#"
+                               class="inline-flex items-center gap-x-2 rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                                New workout
+                            </a>
+                        </div>
+                    </div>
+                </li>
+
             {% endfor %}
+
         </ul>
+
     </div>
 
 {% endblock main_content %}
